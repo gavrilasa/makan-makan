@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/Footer";
-import AutoFoodTruk from "@/components/AutoFoodTruck/AutoFoodTruck"; // <-- TAMBAHKAN INI
+import AutoFoodTruk from "@/components/AutoFoodTruck/AutoFoodTruck";
 
 function App() {
 	return (

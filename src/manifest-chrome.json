@@ -1,17 +1,12 @@
 {
 	"manifest_version": 3,
-	"name": "Siap Dips",
-	"version": "1.2.2",
-	"description": "Extension for better SIAP Undip experience. \nCreated by myudakk.",
+	"name": "Makan Makan",
+	"version": "1.0.0",
+	"description": "Makan Bergizi Gratis Dips Edition",
 	"permissions": ["scripting", "storage", "tabs"],
-	"homepage_url": "https://myudak.com",
-	"options_ui": {
-		"page": "option.html",
-		"open_in_tab": true
-	},
 	"host_permissions": ["*://*.undip.ac.id/*"],
 	"action": {
-		"default_title": "SiAP DiPS",
+		"default_title": "Makan Makan",
 		"default_popup": "popup.html"
 	},
 	"icons": {

@@ -8,12 +8,11 @@ export default defineConfig(() => {
 	const PLUGINS = [
 		react(),
 		flattenOutput({
-			removeDirs: ["src/pages/main", "src/pages/option"],
+			removeDirs: ["src/pages/main"],
 			filePattern: ".html",
 		}),
 	];
 
-	// Disederhanakan karena manifest-firefox.json telah dihapus
 	console.log("Using Chrome manifest.json");
 	PLUGINS.push(
 		viteStaticCopy({
@@ -38,7 +37,6 @@ export default defineConfig(() => {
 			rollupOptions: {
 				input: {
 					popup: path.resolve(__dirname, "src/pages/main/popup.html"),
-					nested: path.resolve(__dirname, "src/pages/option/option.html"),
 					contentFt: path.resolve(__dirname, "src/content-ft.js"),
 					background: path.resolve(__dirname, "src/background.ts"),
 				},
@@ -49,7 +47,7 @@ export default defineConfig(() => {
 						return "assets/[name]-[hash].js";
 					},
 					banner: `/*!
- * myudakk/SiapDips v1.0.0
+ * Makan Makan v0.0.1
  * Copyright (c) ${new Date().getFullYear()} myyudak
  * Licensed under the MIT License
  */`,

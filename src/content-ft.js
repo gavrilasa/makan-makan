@@ -1,495 +1,635 @@
-// content.js
+// content-ft.js
+
+const STORAGE_KEY_LOKASI_FT = "selectedLokasiFT";
+
+// Opsi Lokasi Food Truck
+const lokasiOptions = [
+	{ value: "NONE", label: "- Pilih Lokasi Default -" },
+	{ value: "Auditorium Imam Bardjo", label: "Auditorium Imam Bardjo" },
+	{ value: "Student Center", label: "Student Center" },
+	{ value: "Auditorium FPIK", label: "Auditorium FPIK" },
+	{
+		value: "Halaman Parkir Gedung SA-MWA",
+		label: "Halaman Parkir Gedung SA-MWA",
+	},
+	{
+		value: "ART Center",
+		label: "Gedung ART Center",
+	},
+];
 
 function createHelper() {
-  // Create the main helper card element.
-  const helper = document.createElement("div");
-  Object.assign(helper.style, {
-    position: "fixed",
-    top: "20px",
-    right: "20px",
-    width: "320px",
-    minHeight: "200px",
-    backgroundColor: "#ffffff",
-    borderRadius: "12px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-    padding: "16px",
-    zIndex: "9999",
-    resize: "both",
-    overflow: "auto",
-    border: "1px solid rgba(0,0,0,0.1)",
-    backdropFilter: "blur(10px)",
-    transition: "box-shadow 0.3s ease",
-    transform: "translate(0, 0)",
-  });
+	const helper = document.createElement("div");
+	Object.assign(helper.style, {
+		position: "fixed",
+		top: "20px",
+		right: "20px",
+		width: "300px", // Sedikit lebih sempit
+		minHeight: "auto", // Tinggi otomatis
+		backgroundColor: "rgba(255, 255, 255, 0.98)", // Putih lebih solid
+		borderRadius: "8px", // Radius sudut lebih kecil
+		boxShadow: "0 4px 15px rgba(0,0,0,0.1)", // Shadow disesuaikan
+		padding: "12px 16px", // Padding disesuaikan
+		zIndex: "9999",
+		resize: "both",
+		overflow: "auto",
+		border: "1px solid #e0e0e0", // Border lebih terang
+		backdropFilter: "blur(5px)",
+		transition: "box-shadow 0.3s ease, width 0.3s ease, min-height 0.3s ease", // Transisi untuk minimize
+		transform: "translate(0, 0)",
+		color: "#333",
+		fontFamily:
+			'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+	});
 
-  // Header (drag handle and title)
-  const header = document.createElement("div");
-  Object.assign(header.style, {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "12px",
-    userSelect: "none",
-    padding: "4px 4px 12px 4px",
-    borderBottom: "1px solid rgba(0,0,0,0.06)",
-  });
+	// Header (drag handle and title)
+	const header = document.createElement("div");
+	Object.assign(header.style, {
+		display: "flex",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: "10px", // Margin bawah dikurangi
+		userSelect: "none",
+		paddingBottom: "8px", // Padding bawah dikurangi
+		borderBottom: "1px solid #eee", // Border lebih terang
+	});
 
-  // Title container (logos + text)
-  const titleContainer = document.createElement("div");
-  Object.assign(titleContainer.style, {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    cursor: "move",
-    padding: "4px 8px",
-    borderRadius: "6px",
-    transition: "background-color 0.2s ease",
-  });
+	// Title container ( text only)
+	const titleContainer = document.createElement("div");
+	Object.assign(titleContainer.style, {
+		display: "flex",
+		alignItems: "center",
+		cursor: "move", // Kursor move
+	});
 
-  const logoSiapDips = createLogoSiapDips();
-  const logoMyudak = createLogoMyudak();
-  const titleText = document.createElement("span");
-  titleText.textContent = "Siap Dipss";
-  Object.assign(titleText.style, {
-    fontSize: "18px",
-    fontWeight: "bold",
-    cursor: "default",
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  });
+	const titleText = document.createElement("span");
+	titleText.textContent = "Makan Makan";
+	Object.assign(titleText.style, {
+		fontSize: "16px", // Sedikit lebih kecil
+		fontWeight: "600", // Semi-bold
+	});
 
-  // Close button to remove the card.
-  const closeButton = document.createElement("button");
-  Object.assign(closeButton.style, {
-    border: "none",
-    background: "none",
-    cursor: "pointer",
-    padding: "8px 12px",
-    borderRadius: "6px",
-    color: "#666",
-    fontSize: "16px",
-    transition: "all 0.2s ease",
-    minWidth: "44px",
-    minHeight: "44px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  });
-  closeButton.textContent = "✕";
-  closeButton.addEventListener("mouseenter", () => {
-    closeButton.style.backgroundColor = "#f5f5f5";
-    closeButton.style.color = "#333";
-  });
-  closeButton.addEventListener("mouseleave", () => {
-    closeButton.style.backgroundColor = "transparent";
-    closeButton.style.color = "#666";
-  });
-  closeButton.addEventListener("click", () => helper.remove());
+	// --- Tombol Kontrol (Minimize, Close) ---
+	const controlsContainer = document.createElement("div");
+	controlsContainer.style.display = "flex";
+	controlsContainer.style.alignItems = "center";
+	controlsContainer.style.gap = "4px"; // Jarak antar tombol kontrol
 
-  // Create minimize button
-  const minimizeButton = document.createElement("button");
-  Object.assign(minimizeButton.style, {
-    border: "none",
-    background: "none",
-    cursor: "pointer",
-    padding: "8px 12px",
-    borderRadius: "6px",
-    color: "#666",
-    fontSize: "16px",
-    transition: "all 0.2s ease",
-    marginRight: "8px",
-    minWidth: "44px",
-    minHeight: "44px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  });
-  minimizeButton.textContent = "▼";
-  minimizeButton.title = "Minimize";
+	// Tombol Minimize
+	const minimizeButton = document.createElement("button");
+	Object.assign(minimizeButton.style, {
+		border: "none",
+		background: "none",
+		cursor: "pointer",
+		padding: "4px", // Padding lebih kecil
+		borderRadius: "4px",
+		color: "#999", // Abu-abu lebih terang
+		fontSize: "20px", // Sesuaikan ukuran jika perlu
+		transition: "all 0.2s ease",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		lineHeight: "1",
+	});
+	minimizeButton.textContent = "−";
+	minimizeButton.title = "Minimize";
 
-  minimizeButton.addEventListener("mouseenter", () => {
-    minimizeButton.style.backgroundColor = "#f5f5f5";
-    minimizeButton.style.color = "#333";
-  });
-  minimizeButton.addEventListener("mouseleave", () => {
-    minimizeButton.style.backgroundColor = "transparent";
-    minimizeButton.style.color = "#666";
-  });
+	minimizeButton.addEventListener("mouseenter", () => {
+		minimizeButton.style.backgroundColor = "#f0f0f0";
+		minimizeButton.style.color = "#555";
+	});
+	minimizeButton.addEventListener("mouseleave", () => {
+		minimizeButton.style.backgroundColor = "transparent";
+		minimizeButton.style.color = "#999";
+	});
 
-  // Store original styles for restoring later
-  const originalStyles = {
-    width: helper.style.width,
-    minHeight: helper.style.minHeight,
-    padding: helper.style.padding,
-    borderRadius: helper.style.borderRadius,
-    resize: helper.style.resize,
-  };
+	// Tombol Close
+	const closeButton = document.createElement("button");
+	Object.assign(closeButton.style, {
+		border: "none",
+		background: "none",
+		cursor: "pointer",
+		padding: "4px", // Padding lebih kecil
+		borderRadius: "4px",
+		color: "#999", // Abu-abu lebih terang
+		fontSize: "16px", // Sesuaikan ukuran jika perlu
+		transition: "all 0.2s ease",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		lineHeight: "1",
+	});
+	closeButton.textContent = "✕";
+	closeButton.title = "Close";
 
-  let isMinimized = false;
-  minimizeButton.addEventListener("click", () => {
-    isMinimized = !isMinimized;
-    if (isMinimized) {
-      // Minimize the helper - just hide content, keep header
-      content.style.display = "none";
-      helper.style.minHeight = "auto";
-      helper.style.resize = "none";
-      minimizeButton.textContent = "▲";
-      minimizeButton.title = "Maximize";
-    } else {
-      // Restore the helper
-      content.style.display = "flex";
-      helper.style.minHeight = originalStyles.minHeight;
-      helper.style.resize = originalStyles.resize;
-      minimizeButton.textContent = "▼";
-      minimizeButton.title = "Minimize";
-    }
-  });
+	closeButton.addEventListener("mouseenter", () => {
+		closeButton.style.backgroundColor = "#fdd";
+		closeButton.style.color = "#c82333";
+	});
+	closeButton.addEventListener("mouseleave", () => {
+		closeButton.style.backgroundColor = "transparent";
+		closeButton.style.color = "#999";
+	});
+	closeButton.addEventListener("click", () => helper.remove());
 
-  titleContainer.appendChild(logoSiapDips);
-  titleContainer.appendChild(logoMyudak);
-  titleContainer.appendChild(titleText);
-  header.appendChild(titleContainer);
-  header.appendChild(minimizeButton);
-  header.appendChild(closeButton);
-  helper.appendChild(header);
+	// Store original styles for restoring later
+	const originalStyles = {
+		width: helper.style.width,
+		minHeight: helper.style.minHeight,
+		padding: helper.style.padding,
+		borderRadius: helper.style.borderRadius,
+		resize: helper.style.resize,
+	};
 
-  // Content container for clock, input, and buttons.
-  const content = document.createElement("div");
-  Object.assign(content.style, {
-    minHeight: "100px",
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    padding: "8px 0",
-    alignItems: "center",
-  });
+	let isMinimized = false;
+	minimizeButton.addEventListener("click", () => {
+		isMinimized = !isMinimized;
+		if (isMinimized) {
+			content.style.display = "none";
+			helper.style.minHeight = "auto";
+			helper.style.height = "auto";
+			helper.style.resize = "none";
+			minimizeButton.textContent = "□";
+			minimizeButton.title = "Restore";
+			helper.style.width = "auto"; // Lebar otomatis saat minimize
+		} else {
+			content.style.display = "flex";
+			// Kembalikan minHeight jika diperlukan, atau biarkan auto
+			// helper.style.minHeight = originalStyles.minHeight;
+			helper.style.resize = originalStyles.resize;
+			minimizeButton.textContent = "−";
+			minimizeButton.title = "Minimize";
+			helper.style.width = originalStyles.width;
+		}
+	});
 
-  // Helper function to format a Date to HH:MM:SS.mmm (24h format)
-  function formatTimeWithMilliseconds(date) {
-    const timeString = date.toLocaleTimeString("en-GB", { hour12: false });
-    const ms = date.getMilliseconds().toString().padStart(3, "0");
-    return `${timeString}.${ms}`;
-  }
+	titleContainer.appendChild(titleText);
 
-  const infoText = document.createElement("div");
-  infoText.textContent =
-    "This clock is local and may not accurate, use time.is for accurate time";
-  infoText.style.fontSize = "14px";
-  infoText.style.color = "#555";
-  infoText.style.textAlign = "center";
-  content.appendChild(infoText);
+	controlsContainer.appendChild(minimizeButton);
+	controlsContainer.appendChild(closeButton);
 
-  // Live clock display in 24-hour format with milliseconds.
-  const liveClock = document.createElement("div");
-  Object.assign(liveClock.style, {
-    fontSize: "24px",
-    fontWeight: "bold",
-    textAlign: "center",
-  });
-  // Initial display:
-  liveClock.textContent = formatTimeWithMilliseconds(new Date());
-  // Update every 50ms for smooth millisecond display.
-  setInterval(() => {
-    liveClock.textContent = formatTimeWithMilliseconds(new Date());
-  }, 50);
-  content.appendChild(liveClock);
+	header.appendChild(titleContainer);
+	header.appendChild(controlsContainer);
+	helper.appendChild(header);
 
-  // Container for scheduling auto-refresh.
-  const scheduleContainer = document.createElement("div");
-  Object.assign(scheduleContainer.style, {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    alignItems: "center",
-    width: "100%",
-  });
+	// Content container
+	const content = document.createElement("div");
+	Object.assign(content.style, {
+		width: "100%",
+		display: "flex",
+		flexDirection: "column",
+		gap: "10px", // *** GAP UTAMA ANTAR ELEMEN DIKURANGI ***
+		alignItems: "stretch", // Elemen mengisi lebar container
+	});
 
-  // Enhanced time input allowing milliseconds, default "10:00:00.000".
-  const timeInput = document.createElement("input");
-  timeInput.type = "time";
-  timeInput.value = "10:00:00.000";
-  // Set step to 0.001 to allow millisecond precision.
-  timeInput.step = "0.001";
-  Object.assign(timeInput.style, {
-    fontSize: "16px",
-    padding: "4px",
-    width: "80%",
-    textAlign: "center",
-  });
-  scheduleContainer.appendChild(timeInput);
+	function formatTimeWithMilliseconds(date) {
+		const hours = date.getHours().toString().padStart(2, "0");
+		const minutes = date.getMinutes().toString().padStart(2, "0");
+		const seconds = date.getSeconds().toString().padStart(2, "0");
+		const ms = date.getMilliseconds().toString().padStart(3, "0");
+		return `${hours}:${minutes}:${seconds}.${ms}`;
+	}
 
-  // Indicator for scheduled auto-refresh time.
-  const scheduleIndicator = document.createElement("div");
-  scheduleIndicator.textContent = "Belum Auto Refresh X";
-  scheduleIndicator.style.fontSize = "14px";
-  scheduleIndicator.style.color = "#555";
-  scheduleContainer.appendChild(scheduleIndicator);
+	const infoText = document.createElement("div");
+	infoText.textContent =
+		"This clock is local and may not accurate, use time.is for accurate time";
+	Object.assign(infoText.style, {
+		fontSize: "11px", // Teks lebih kecil
+		color: "#666", // Abu-abu lebih gelap
+		textAlign: "center",
+		// Margin diatur oleh gap
+	});
+	content.appendChild(infoText);
 
-  // Button to schedule auto refresh.
-  const scheduleButton = document.createElement("button");
-  scheduleButton.textContent = "Gas Auto Refresh Jam";
-  Object.assign(scheduleButton.style, {
-    padding: "8px 12px",
-    fontSize: "16px",
-    cursor: "pointer",
-    border: "none",
-    borderRadius: "6px",
-    backgroundColor: "#28a745",
-    color: "#ffffff",
-    transition: "background-color 0.3s ease",
-    width: "100%",
-  });
-  scheduleButton.addEventListener("mouseenter", () => {
-    scheduleButton.style.backgroundColor = "#1e7e34";
-  });
-  scheduleButton.addEventListener("mouseleave", () => {
-    scheduleButton.style.backgroundColor = "#28a745";
-  });
-  scheduleButton.addEventListener("click", () => {
-    // Parse the time from the input (expects "HH:MM:SS.mmm" in 24h format).
-    const parts = timeInput.value.split(":");
-    const inputHour = Number(parts[0]);
-    const inputMinute = Number(parts[1]);
-    let inputSecond = 0,
-      inputMillisecond = 0;
-    if (parts[2].includes(".")) {
-      const secParts = parts[2].split(".");
-      inputSecond = Number(secParts[0]);
-      inputMillisecond = Number(secParts[1]);
-    } else {
-      inputSecond = Number(parts[2]);
-    }
+	const liveClock = document.createElement("div");
+	Object.assign(liveClock.style, {
+		fontSize: "28px", // Jam sedikit lebih besar
+		fontWeight: "600", // Semi-bold
+		textAlign: "center",
+		letterSpacing: "0.5px", // Spasi antar karakter
+		color: "#222", // Warna lebih gelap
+		// Margin diatur oleh gap
+	});
+	liveClock.textContent = formatTimeWithMilliseconds(new Date());
+	const clockInterval = setInterval(() => {
+		liveClock.textContent = formatTimeWithMilliseconds(new Date());
+	}, 50);
 
-    const now = new Date();
-    const target = new Date();
-    target.setHours(inputHour, inputMinute, inputSecond, inputMillisecond); // Set target time today.
-    // If the target time is earlier than now, schedule for tomorrow.
-    if (now >= target) {
-      target.setDate(target.getDate() + 1);
-    }
-    const delay = target - now;
-    // Update the indicator with the scheduled time (with milliseconds).
-    scheduleIndicator.textContent = `Auto refresh jam ${formatTimeWithMilliseconds(
-      target
-    )}`;
-    // Schedule the auto refresh.
-    setTimeout(() => {
-      location.reload();
-    }, delay);
+	const observer = new MutationObserver((mutationsList, observerInstance) => {
+		for (const mutation of mutationsList) {
+			if (mutation.type === "childList") {
+				mutation.removedNodes.forEach((node) => {
+					if (node === helper) {
+						clearInterval(clockInterval);
+						observerInstance.disconnect();
+					}
+				});
+			}
+		}
+	});
+	observer.observe(document.body, { childList: true });
+	content.appendChild(liveClock);
 
-    Toastify({
-      text: "Siap DIps ~~> Gas Auto Refresh Jam",
-      duration: 3000,
-      close: true,
-      position: "left",
-    }).showToast();
-  });
-  scheduleContainer.appendChild(scheduleButton);
-  content.appendChild(scheduleContainer);
+	// --- Lokasi Default Section ---
+	const lokasiContainer = document.createElement("div");
+	Object.assign(lokasiContainer.style, {
+		display: "flex",
+		flexDirection: "column",
+		gap: "4px", // Jarak kecil antara label dan select
+		width: "100%",
+		// Margin diatur oleh gap
+	});
 
-  // "Refresh Now" button.
-  const refreshNowButton = document.createElement("button");
-  refreshNowButton.textContent = "Refresh Now";
-  Object.assign(refreshNowButton.style, {
-    padding: "8px 12px",
-    fontSize: "16px",
-    cursor: "pointer",
-    border: "none",
-    borderRadius: "6px",
-    backgroundColor: "#dc3545",
-    color: "#ffffff",
-    transition: "background-color 0.3s ease",
-    width: "100%",
-  });
-  refreshNowButton.addEventListener("mouseenter", () => {
-    refreshNowButton.style.backgroundColor = "#c82333";
-  });
-  refreshNowButton.addEventListener("mouseleave", () => {
-    refreshNowButton.style.backgroundColor = "#dc3545";
-  });
-  refreshNowButton.addEventListener("click", () => {
-    location.reload();
-  });
-  content.appendChild(refreshNowButton);
+	const lokasiLabel = document.createElement("label");
+	lokasiLabel.textContent = "Default Lokasi FT:";
+	Object.assign(lokasiLabel.style, {
+		fontSize: "13px", // Ukuran label standar
+		fontWeight: "500", // Medium
+		color: "#444",
+		textAlign: "left", // Rata kiri
+	});
 
-  //  button.
-  const TimeIsButton = document.createElement("button");
-  TimeIsButton.textContent = "Time.is {More Accurate time}";
-  Object.assign(TimeIsButton.style, {
-    padding: "8px 12px",
-    fontSize: "16px",
-    cursor: "pointer",
-    border: "none",
-    borderRadius: "6px",
-    backgroundColor: "#6f9efe",
-    color: "#ffffff",
-    transition: "background-color 0.3s ease",
-    width: "100%",
-  });
-  TimeIsButton.addEventListener("mouseenter", () => {
-    TimeIsButton.style.backgroundColor = "#3C7CFE";
-  });
-  TimeIsButton.addEventListener("mouseleave", () => {
-    TimeIsButton.style.backgroundColor = "#6F9EFE";
-  });
-  TimeIsButton.addEventListener("click", () => {
-    window.open("https://time.is", "_blank", "noopener,noreferrer");
-  });
-  content.appendChild(TimeIsButton);
+	const lokasiSelect = document.createElement("select");
+	Object.assign(lokasiSelect.style, {
+		fontSize: "14px",
+		padding: "8px 10px", // Padding standar
+		width: "100%",
+		border: `1px solid #ccc`,
+		borderRadius: "6px", // Radius sudut sedikit lebih besar
+		backgroundColor: "#fff",
+		color: "#333",
+		boxSizing: "border-box",
+		appearance: "none", // Hilangkan panah default
+		backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, // Panah custom
+		backgroundRepeat: "no-repeat",
+		backgroundPosition: "right 10px center",
+		backgroundSize: "10px 10px",
+		cursor: "pointer",
+	});
 
-  // Assemble the helper card.
-  helper.appendChild(content);
-  document.body.appendChild(helper);
+	lokasiOptions.forEach((option) => {
+		const optElement = document.createElement("option");
+		optElement.value = option.value;
+		optElement.textContent = option.label;
+		lokasiSelect.appendChild(optElement);
+	});
 
-  // Enable dragging for the helper using the title container as the handle.
-  new Draggable({ element: helper, handle: titleContainer });
-  return helper;
-}
+	chrome.storage.local.get([STORAGE_KEY_LOKASI_FT], (result) => {
+		if (result[STORAGE_KEY_LOKASI_FT]) {
+			lokasiSelect.value = result[STORAGE_KEY_LOKASI_FT];
+		}
+	});
 
-function createLogoSiapDips() {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  svg.setAttribute("viewBox", "0 0 283.46 283.46");
-  svg.setAttribute("width", "20");
-  svg.setAttribute("height", "20");
-  svg.setAttribute("class", "stroke-black dark:stroke-white");
+	lokasiSelect.addEventListener("change", () => {
+		const selectedValue = lokasiSelect.value;
+		chrome.storage.local.set({ [STORAGE_KEY_LOKASI_FT]: selectedValue }, () => {
+			Toastify({
+				text: "Lokasi default disimpan!",
+				duration: 2000,
+				close: true,
+				gravity: "top",
+				position: "right",
+			}).showToast();
+		});
+	});
 
-  // First path
-  const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path1.setAttribute(
-    "d",
-    "m94.86,34.25l1.76,30.39c-8.19-.18-14.5-.15-18.92.09-14.12.82-21.15,6.09-21.11,15.79.05,9.27,7.4,13.87,22.06,13.8,7.22-.04,14.6-1.8,22.13-5.28,4.84-2.29,11.88-6.91,21.12-13.85l22.56-15.31c12.25-8.25,22.41-14.18,30.48-17.78,11.08-4.9,21.96-7.38,32.63-7.43,14.01-.07,25.24,3.65,33.69,11.16,9.42,8.25,14.16,19.55,14.23,33.89.07,14.66-5.16,25.68-15.69,33.06-8.17,5.86-19.04,8.93-32.62,9.21-1.08,0-4.8.02-11.16.05l-3.22-30.22c9.59-.05,16.33-.35,20.21-.91,9.26-1.34,13.88-5.62,13.84-12.84-.04-8.63-6.96-12.9-20.76-12.83-7.76.04-14.92,1.85-21.48,5.44-3.98,2.18-12.52,7.66-25.63,16.46l-22.73,15.63c-21.49,14.87-42.21,22.36-62.15,22.46-11.86.06-21.57-2.43-29.14-7.46-11.25-7.38-16.91-19.75-17-37.11-.08-16.39,5.47-28.7,16.64-36.95,5.91-4.45,12.2-7.28,18.88-8.5,5.38-.89,11.96-1.35,19.72-1.39,3.56-.02,7.44.13,11.65.43Z"
-  );
-  path1.setAttribute("class", "stroke-black dark:stroke-white top-path");
-  path1.setAttribute("style", "stroke-miterlimit: 10; stroke-width: 14px;");
+	lokasiContainer.appendChild(lokasiLabel);
+	lokasiContainer.appendChild(lokasiSelect);
+	content.appendChild(lokasiContainer);
+	// --- End Lokasi Default Section ---
 
-  // Second path
-  const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path2.setAttribute(
-    "d",
-    "m252.41,161.34l.16,32.99c1.47,35.68-15.37,53.92-50.51,54.74l-119.17.58c-35.15-.48-52.16-18.56-51.04-54.25l-.16-32.99,220.72-1.07Zm-191.95,31.82l.02,3.88c.04,9.06,2.07,15.14,6.07,18.24,3.03,2.25,8.42,3.41,16.19,3.48l119.17-.58c8.84-.15,14.81-2.01,17.92-5.58,2.68-3.25,4.05-8.7,4.13-16.35l-.02-3.88-163.48.79Z"
-  );
-  path2.setAttribute("class", "stroke-black dark:stroke-white bottom-path");
-  path2.setAttribute("style", "stroke-miterlimit: 10; stroke-width: 14px;");
+	// Container for scheduling auto-refresh.
+	const scheduleContainer = document.createElement("div");
+	Object.assign(scheduleContainer.style, {
+		display: "flex",
+		flexDirection: "column",
+		gap: "6px", // Jarak antara input waktu, indikator, dan tombol
+		alignItems: "stretch", // Elemen mengisi lebar
+		width: "100%",
+	});
 
-  svg.appendChild(path1);
-  svg.appendChild(path2);
+	// Enhanced time input
+	const timeInput = document.createElement("input");
+	timeInput.type = "time";
+	timeInput.value = "10:00:00.000";
+	timeInput.step = "0.001";
+	Object.assign(timeInput.style, {
+		fontSize: "16px",
+		padding: "8px 10px", // Padding standar
+		width: "100%",
+		textAlign: "center",
+		border: `1px solid #ccc`,
+		borderRadius: "6px", // Radius sudut sedikit lebih besar
+		backgroundColor: "#fff",
+		color: "#333",
+		boxSizing: "border-box",
+	});
+	scheduleContainer.appendChild(timeInput);
 
-  return svg;
-}
+	// Indicator
+	const scheduleIndicator = document.createElement("div");
+	scheduleIndicator.textContent = "Belum Auto Refresh X";
+	Object.assign(scheduleIndicator.style, {
+		fontSize: "12px", // Sedikit lebih kecil
+		color: "#666", // Abu-abu lebih gelap
+		textAlign: "center", // Tengah
+	});
+	scheduleContainer.appendChild(scheduleIndicator);
 
-function createLogoMyudak() {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 595.28 595.28");
-  svg.setAttribute("width", "20");
-  svg.setAttribute("height", "20");
-  Object.assign(svg.style, { cursor: "pointer" });
+	// Button schedule auto refresh
+	const scheduleButton = document.createElement("button");
+	scheduleButton.textContent = "Gas Auto Refresh Jam";
+	Object.assign(scheduleButton.style, {
+		padding: "10px 12px", // Padding standar tombol
+		fontSize: "15px", // Ukuran font tombol
+		fontWeight: "500", // Medium
+		cursor: "pointer",
+		border: "none",
+		borderRadius: "6px",
+		backgroundColor: "#28a745", // Warna hijau
+		color: "#ffffff",
+		transition: "background-color 0.2s ease",
+		width: "100%",
+		boxSizing: "border-box",
+	});
 
-  const polygons = [
-    "206.43 406.96 297.66 564.99 297.65 565.01 115 565.01 206.32 406.83 206.34 406.8 206.43 406.96",
-    "571.62 90.47 480.3 248.65 388.99 406.8 297.75 248.78 297.66 248.63 388.97 90.47 571.62 90.47",
-    "297.65 248.65 115 248.65 23.67 90.47 206.32 90.47 297.65 248.65",
-  ];
+	scheduleButton.addEventListener("mouseenter", () => {
+		scheduleButton.style.backgroundColor = "#218838";
+	});
+	scheduleButton.addEventListener("mouseleave", () => {
+		scheduleButton.style.backgroundColor = "#28a745";
+	});
 
-  polygons.forEach((points) => {
-    const polygon = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polygon"
-    );
-    polygon.setAttribute("points", points);
-    polygon.setAttribute("fill", "currentColor");
-    svg.appendChild(polygon);
-  });
-  return svg;
+	scheduleButton.addEventListener("click", () => {
+		const timeValue = timeInput.value;
+		if (!timeValue) {
+			scheduleIndicator.textContent = "Format waktu salah!";
+			scheduleIndicator.style.color = "red";
+			return;
+		}
+		const parts = timeValue.split(/[:.]/);
+		if (parts.length < 3) {
+			scheduleIndicator.textContent = "Format waktu salah!";
+			scheduleIndicator.style.color = "red";
+			return;
+		}
+		const inputHour = Number(parts[0]);
+		const inputMinute = Number(parts[1]);
+		const inputSecond = Number(parts[2]);
+		const inputMillisecond =
+			parts.length > 3 ? Number(parts[3].padEnd(3, "0")) : 0;
+
+		if (
+			isNaN(inputHour) ||
+			isNaN(inputMinute) ||
+			isNaN(inputSecond) ||
+			isNaN(inputMillisecond) ||
+			inputHour < 0 ||
+			inputHour > 23 ||
+			inputMinute < 0 ||
+			inputMinute > 59 ||
+			inputSecond < 0 ||
+			inputSecond > 59 ||
+			inputMillisecond < 0 ||
+			inputMillisecond > 999
+		) {
+			scheduleIndicator.textContent = "Format waktu salah!";
+			scheduleIndicator.style.color = "red";
+			return;
+		}
+
+		const now = new Date();
+		const target = new Date();
+		target.setHours(inputHour, inputMinute, inputSecond, inputMillisecond);
+		if (now >= target) {
+			target.setDate(target.getDate() + 1);
+		}
+		const delay = target - now;
+
+		if (delay < 0) {
+			scheduleIndicator.textContent = "Waktu target sudah lewat!";
+			scheduleIndicator.style.color = "red";
+			return;
+		}
+
+		scheduleIndicator.textContent = `Auto refresh jam ${formatTimeWithMilliseconds(
+			target
+		)}`;
+		scheduleIndicator.style.color = "#555";
+
+		setTimeout(() => {
+			location.reload();
+		}, delay);
+
+		Toastify({
+			text: "Auto Refresh Jam 10",
+			duration: 3000,
+			close: true,
+			gravity: "top",
+			position: "right",
+		}).showToast();
+	});
+	scheduleContainer.appendChild(scheduleButton);
+	content.appendChild(scheduleContainer);
+
+	// Container untuk dua tombol bawah agar gapnya sama
+	const bottomButtonsContainer = document.createElement("div");
+	Object.assign(bottomButtonsContainer.style, {
+		display: "flex",
+		flexDirection: "column",
+		gap: "8px", // *** JARAK ANTAR TOMBOL BAWAH ***
+		width: "100%",
+		// Margin atas diatur oleh gap dari `content`
+	});
+
+	// "Refresh Now" button.
+	const refreshNowButton = document.createElement("button");
+	refreshNowButton.textContent = "Refresh Now";
+	Object.assign(refreshNowButton.style, {
+		padding: "10px 12px", // Padding standar tombol
+		fontSize: "15px", // Ukuran font tombol
+		fontWeight: "500", // Medium
+		cursor: "pointer",
+		border: "none",
+		borderRadius: "6px",
+		backgroundColor: "#dc3545", // Warna merah
+		color: "#ffffff",
+		transition: "background-color 0.2s ease",
+		width: "100%",
+		boxSizing: "border-box",
+	});
+
+	refreshNowButton.addEventListener("mouseenter", () => {
+		refreshNowButton.style.backgroundColor = "#c82333";
+	});
+	refreshNowButton.addEventListener("mouseleave", () => {
+		refreshNowButton.style.backgroundColor = "#dc3545";
+	});
+	refreshNowButton.addEventListener("click", () => {
+		location.reload();
+	});
+	bottomButtonsContainer.appendChild(refreshNowButton); // Tambahkan ke container bawah
+
+	// Time.is button.
+	const TimeIsButton = document.createElement("button");
+	TimeIsButton.textContent = "Time.is {More Accurate time}";
+	Object.assign(TimeIsButton.style, {
+		padding: "10px 12px", // Padding standar tombol
+		fontSize: "15px", // Ukuran font tombol
+		fontWeight: "500", // Medium
+		cursor: "pointer",
+		border: "none",
+		borderRadius: "6px",
+		backgroundColor: "#007bff", // Warna biru primer
+		color: "#ffffff",
+		transition: "background-color 0.2s ease",
+		width: "100%",
+		boxSizing: "border-box",
+	});
+
+	TimeIsButton.addEventListener("mouseenter", () => {
+		TimeIsButton.style.backgroundColor = "#0056b3"; // Biru lebih gelap
+	});
+	TimeIsButton.addEventListener("mouseleave", () => {
+		TimeIsButton.style.backgroundColor = "#007bff";
+	});
+	TimeIsButton.addEventListener("click", () => {
+		window.open("https://time.is", "_blank", "noopener,noreferrer");
+	});
+	bottomButtonsContainer.appendChild(TimeIsButton); // Tambahkan ke container bawah
+
+	content.appendChild(bottomButtonsContainer); // Tambahkan container tombol bawah ke content
+
+	// Assemble the helper card.
+	helper.appendChild(content);
+	document.body.appendChild(helper);
+
+	// Enable dragging for the helper using the title container as the handle.
+	new Draggable({ element: helper, handle: titleContainer });
+	return helper;
 }
 
 // A simple draggable implementation.
 if (typeof window.Draggable === "undefined") {
-  class Draggable {
-    constructor({ element, handle }) {
-      this.element = element;
-      this.handle = handle;
-      this.dragging = false;
-      this.offsetX = 0;
-      this.offsetY = 0;
+	class Draggable {
+		constructor({ element, handle }) {
+			this.element = element;
+			this.handle = handle;
+			this.dragging = false;
+			this.offsetX = 0;
+			this.offsetY = 0;
+			this.initialX = 0;
+			this.initialY = 0;
 
-      // Bind all event handlers
-      this.onMouseMove = this.onMouseMove.bind(this);
-      this.onMouseUp = this.onMouseUp.bind(this);
-      this.onTouchMove = this.onTouchMove.bind(this);
-      this.onTouchEnd = this.onTouchEnd.bind(this);
+			// Bind all event handlers
+			this.onMouseMove = this.onMouseMove.bind(this);
+			this.onMouseUp = this.onMouseUp.bind(this);
+			this.onTouchMove = this.onTouchMove.bind(this);
+			this.onTouchEnd = this.onTouchEnd.bind(this);
 
-      // Add mouse and touch event listeners
-      this.handle.addEventListener("mousedown", this.onMouseDown.bind(this));
-      this.handle.addEventListener("touchstart", this.onTouchStart.bind(this));
-    }
-    onMouseDown(e) {
-      this.dragging = true;
-      const rect = this.element.getBoundingClientRect();
-      this.offsetX = e.clientX - rect.left;
-      this.offsetY = e.clientY - rect.top;
-      document.addEventListener("mousemove", this.onMouseMove);
-      document.addEventListener("mouseup", this.onMouseUp);
-    }
-    onMouseMove(e) {
-      if (this.dragging) {
-        this.element.style.left = e.clientX - this.offsetX + "px";
-        this.element.style.top = e.clientY - this.offsetY + "px";
-      }
-    }
-    onMouseUp() {
-      this.dragging = false;
-      document.removeEventListener("mousemove", this.onMouseMove);
-      document.removeEventListener("mouseup", this.onMouseUp);
-    }
-
-    onTouchStart(e) {
-      e.preventDefault();
-      this.dragging = true;
-      const touch = e.touches[0];
-      const rect = this.element.getBoundingClientRect();
-      this.offsetX = touch.clientX - rect.left;
-      this.offsetY = touch.clientY - rect.top;
-      document.addEventListener("touchmove", this.onTouchMove, {
-        passive: false,
-      });
-      document.addEventListener("touchend", this.onTouchEnd);
-    }
-
-    onTouchMove(e) {
-      if (this.dragging) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        this.element.style.left = touch.clientX - this.offsetX + "px";
-        this.element.style.top = touch.clientY - this.offsetY + "px";
-      }
-    }
-
-    onTouchEnd() {
-      this.dragging = false;
-      document.removeEventListener("touchmove", this.onTouchMove);
-      document.removeEventListener("touchend", this.onTouchEnd);
-    }
-  }
-
-  window.Draggable = Draggable; // Store it globally
+			// Add mouse and touch event listeners
+			this.handle.addEventListener("mousedown", this.onMouseDown.bind(this));
+			this.handle.addEventListener("touchstart", this.onTouchStart.bind(this), {
+				passive: false,
+			});
+		}
+		onMouseDown(e) {
+			if (e.button !== 0) return;
+			this.dragging = true;
+			this.initialX = parseInt(this.element.style.left || "0", 10);
+			this.initialY = parseInt(this.element.style.top || "0", 10);
+			this.offsetX = e.clientX - this.initialX;
+			this.offsetY = e.clientY - this.initialY;
+			this.handle.style.cursor = "grabbing";
+			document.body.style.cursor = "grabbing";
+			document.addEventListener("mousemove", this.onMouseMove);
+			document.addEventListener("mouseup", this.onMouseUp);
+		}
+		onMouseMove(e) {
+			if (this.dragging) {
+				e.preventDefault();
+				const newX = e.clientX - this.offsetX;
+				const newY = e.clientY - this.offsetY;
+				this.element.style.left = newX + "px";
+				this.element.style.top = newY + "px";
+			}
+		}
+		onMouseUp() {
+			if (this.dragging) {
+				this.dragging = false;
+				this.handle.style.cursor = "move";
+				document.body.style.cursor = "default";
+				document.removeEventListener("mousemove", this.onMouseMove);
+				document.removeEventListener("mouseup", this.onMouseUp);
+			}
+		}
+		onTouchStart(e) {
+			e.preventDefault();
+			this.dragging = true;
+			const touch = e.touches[0];
+			this.initialX = parseInt(this.element.style.left || "0", 10);
+			this.initialY = parseInt(this.element.style.top || "0", 10);
+			this.offsetX = touch.clientX - this.initialX;
+			this.offsetY = touch.clientY - this.initialY;
+			document.addEventListener("touchmove", this.onTouchMove, {
+				passive: false,
+			});
+			document.addEventListener("touchend", this.onTouchEnd);
+			document.addEventListener("touchcancel", this.onTouchEnd);
+		}
+		onTouchMove(e) {
+			if (this.dragging) {
+				e.preventDefault();
+				const touch = e.touches[0];
+				const newX = touch.clientX - this.offsetX;
+				const newY = touch.clientY - this.offsetY;
+				this.element.style.left = newX + "px";
+				this.element.style.top = newY + "px";
+			}
+		}
+		onTouchEnd() {
+			if (this.dragging) {
+				this.dragging = false;
+				document.removeEventListener("touchmove", this.onTouchMove);
+				document.removeEventListener("touchend", this.onTouchEnd);
+				document.removeEventListener("touchcancel", this.onTouchEnd);
+			}
+		}
+	}
+	window.Draggable = Draggable;
 }
+
 function triggerScroll(elementId) {
-  const element = document.querySelector(elementId);
-  if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-    });
-  }
+	setTimeout(() => {
+		const element = document.querySelector(elementId);
+		if (element) {
+			element.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+			});
+			element.style.transition = "outline 0.1s ease-out";
+			element.style.outline = "2px solid #3C7CFE"; // Blue outline
+			setTimeout(() => {
+				element.style.outline = "none";
+			}, 1000);
+		} else {
+			console.warn("Element " + elementId + " not found for scrolling.");
+		}
+	}, 100);
 }
 
 // Initialize the helper when the content script loads.
-Toastify({
-  text: "Siap DIps ~~> FOOD TRUK",
-  duration: 3000,
-  close: true,
-  position: "left",
-}).showToast();
-createHelper();
-triggerScroll("#tanggal");
+if (!document.getElementById("siap-dips-ft-helper")) {
+	const helperElement = createHelper();
+	helperElement.id = "siap-dips-ft-helper";
+	Toastify({
+		text: "Script Loaded",
+		duration: 3000,
+		close: true,
+		gravity: "top",
+		position: "right",
+	}).showToast();
+	triggerScroll("#tanggal");
+} else {
+	console.log("Makan makan already exists.");
+}
