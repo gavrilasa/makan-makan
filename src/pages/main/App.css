@@ -1,0 +1,73 @@
+#root {
+  min-width: 24rem;
+  max-width: 34rem;
+}
+
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.main::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+.main {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* LOGO */
+
+.logo-containerNew polygon {
+  transition: all 0.5s ease-in-out;
+  transform-origin: center;
+}
+
+.logo-containerNew:hover polygon:nth-child(1) {
+  transform: rotate(360deg);
+}
+
+.logo-containerNew:hover polygon:nth-child(2) {
+  transform: rotate(-360deg);
+  transition-delay: 0.1s;
+}
+
+.logo-containerNew:hover polygon:nth-child(3) {
+  transform: rotate(360deg);
+  transition-delay: 0.2s;
+}
+
+/*  */
+.logo-wrapper svg {
+  transform: scale(1) rotate(0deg);
+  filter: drop-shadow(0 0 0 rgba(37, 99, 235, 0));
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-wrapper:hover svg {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 0 20px rgba(37, 99, 235, 0.6));
+}
+
+.logo-wrapper .top-path {
+  transform: translate(0, 0);
+  stroke-width: 2;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-wrapper .bottom-path {
+  transform: translate(0, 0);
+  stroke-width: 2;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.logo-wrapper:hover .top-path {
+  transform: translate(-20px, -10px);
+  /* fill: var(--background);
+  stroke: var(--background); */
+  stroke-width: 3;
+}
+
+.logo-wrapper:hover .bottom-path {
+  transform: translate(20px, 10px);
+  /* fill: var(--background);
+  stroke: var(--background); */
+  stroke-width: 3;
+}
