@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/sonner";
 
 import Navbar from "./components/Navbar";
 import SiteFooter from "./components/Footer";
-import HeaderSection from "./components/Header";
 import LokasiFoodTruk from "./components/Settings/Settingcard.ft";
 
 const LandingPage = () => {
@@ -15,7 +14,6 @@ const LandingPage = () => {
 				<Navbar />
 				<div className="min-h-screen main bg-background">
 					<div className="container px-4 mx-auto sm:px-6 lg:px-8">
-						<HeaderSection />
 						<section id="settings" className="py-12">
 							<h2 className="text-3xl font-bold tracking-tight">Pengaturan</h2>
 							<p className="text-muted-foreground">
